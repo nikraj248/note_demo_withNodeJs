@@ -9,26 +9,44 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 const monthsName=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+// bool flag=true;
+
 class NotesList extends StatefulWidget {
   const NotesList({Key? key}) : super(key: key);
+
+
 
   @override
   State<NotesList> createState() => _NotesListState();
 }
 
 class _NotesListState extends State<NotesList> {
+
+
   @override
   Widget build(BuildContext context) {
 
     NotesProvider notesProvider = Provider.of<NotesProvider>(context);
-
-
-
+    //notesProvider.updateNotesFromCloud();
+    // if(notesProvider.database!=null){
+    //
+    // }
+    // if(flag){
+    //   print("10000001");
+    //   notesProvider.updateNotesFromCloud();
+    //   flag=false;
+    // }
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: const Text("UserNotes"),
           centerTitle: true,
+          actions: <Widget>[
+            IconButton(onPressed: (){
+              notesProvider.updateNotesFromCloud();
+
+            }, icon: Icon(Icons.refresh))
+          ],
         ),
         body: (notesProvider.isDataLoading==false)?StaggeredGridView.countBuilder(
             crossAxisCount: 2,
