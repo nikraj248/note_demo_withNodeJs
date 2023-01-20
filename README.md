@@ -1,5 +1,7 @@
 # note_demo_nodejs
 
+# complete note app frontend integrated with backend
+
 A new Flutter project.
 
 ## Getting Started
