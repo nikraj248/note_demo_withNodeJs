@@ -16,7 +16,7 @@ class NotesProvider with ChangeNotifier{
   static bool flag = true;
 
   static Database? _database;
-  String noteTable = 'note_table58831111';
+  String noteTable = 'note_table2533808031111';
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
@@ -139,7 +139,7 @@ class NotesProvider with ChangeNotifier{
       // }
 
       print("802");
-      newNotesListFromStorage = await ApiServices.getAllNotesList();
+      newNotesListFromStorage = await initialLocalDBsetup();
 
       //uploading data from local to api -> now api contains latest data
       //also copying api's latest data to local cache
@@ -262,7 +262,7 @@ class NotesProvider with ChangeNotifier{
 
     print("a4");
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = '${directory.path}notes5881101.db';
+    String path = '${directory.path}notes250833081101.db';
 
     print("a5   "+path);
     var notesDatabase = await openDatabase(path, version: 1, onCreate: _createDb);
