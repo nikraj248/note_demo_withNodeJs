@@ -16,7 +16,7 @@ class NotesProvider with ChangeNotifier{
   static bool flag = true;
 
   static Database? _database;
-  String noteTable = 'note_table22211';
+  String noteTable = 'note_table8221101';
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
@@ -213,7 +213,7 @@ class NotesProvider with ChangeNotifier{
 
     print("a4");
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = '${directory.path}notes3210.db';
+    String path = '${directory.path}notes821001.db';
 
     print("a5   "+path);
     var notesDatabase = await openDatabase(path, version: 1, onCreate: _createDb);

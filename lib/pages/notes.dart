@@ -140,7 +140,7 @@ class _NotesListState extends State<NotesList> {
             staggeredTileBuilder: (index) {
               return StaggeredTile.fit(1);
             }):const Center(
-          child: CircularProgressIndicator(),
+          child: Text("no notes yet"),//CircularProgressIndicator(),
         ),
 
 
