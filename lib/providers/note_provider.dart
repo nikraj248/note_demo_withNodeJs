@@ -139,7 +139,7 @@ class NotesProvider with ChangeNotifier{
       // }
 
       print("802");
-      newNotesListFromStorage = await initialLocalDBsetup();
+      newNotesListFromStorage = await ApiServices.getAllNotesList();
 
       //uploading data from local to api -> now api contains latest data
       //also copying api's latest data to local cache
