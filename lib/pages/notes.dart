@@ -9,6 +9,15 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 const monthsName=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+const colorsCard=[
+  0xFFF8BBD0,
+  0xFFFF8A80,
+  0xFFFFAB91,
+  0xFFFFCC80,
+  0xFFFFD54F,
+  0xFFC5E1A5,
+  0xFFB2DFDB];
+
 // bool flag=true;
 
 class NotesList extends StatefulWidget {
@@ -38,19 +47,42 @@ class _NotesListState extends State<NotesList> {
     // }
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Color(0xFFE3F2FD),
+        // 0xFFE3F2FD
+        // 0xFFF8BBD0
+        // 0xFFFF8A80
+        // 0xFFFFAB91
+        // 0xFFFFCC80
+        // 0xFFFFD54F
+        // 0xFFC5E1A5
+        // 0xFFB2DFDB
         appBar: AppBar(
           title: const Text("UserNotes"),
           centerTitle: true,
-          actions: <Widget>[
-            IconButton(onPressed: (){
-              setState(() {
-                notesProvider.updateNotesFromCloud();
-              });
-
-            }, icon: Icon(Icons.refresh))
-          ],
+          // actions: <Widget>[
+          //   IconButton(onPressed: (){
+          //     setState(() {
+          //       notesProvider.updateNotesFromCloud();
+          //     });
+          //
+          //   }, icon: Icon(Icons.refresh))
+          // ],
         ),
-        body: (notesProvider.isDataLoading==false)?StaggeredGridView.countBuilder(
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              Container(
+                padding: EdgeInsets.only(top: 100),
+                child: Column(
+                  children: [Text("Single Tap to edit"),
+                    Text("Double Tap to delete"),],
+                ),
+              )
+
+            ],
+          ),
+        ),
+        body: (notesProvider.isDataLoading==false)?(notesProvider.notesList.isEmpty==false)?StaggeredGridView.countBuilder(
             crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 12,
@@ -67,7 +99,8 @@ class _NotesListState extends State<NotesList> {
                   child: Card(
                     elevation: 20,
 
-                    color: Colors.white70, //Color(0xff252525),
+                    //color: Colors.white70, //Color(0xff252525),
+                    color: Color(colorsCard[index%7]),
 
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -141,7 +174,9 @@ class _NotesListState extends State<NotesList> {
               return StaggeredTile.fit(1);
             }):const Center(
           child: Text("no notes yet"),//CircularProgressIndicator(),
-        ),
+        ):const Center(
+          child: CircularProgressIndicator(),//CircularProgressIndicator(),
+    ),
 
 
         floatingActionButton: FloatingActionButton(

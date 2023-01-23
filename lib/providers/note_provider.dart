@@ -16,7 +16,7 @@ class NotesProvider with ChangeNotifier{
   static bool flag = true;
 
   static Database? _database;
-  String noteTable = 'note_table8221101';
+  String noteTable = 'note_table58831111';
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
@@ -28,36 +28,71 @@ class NotesProvider with ChangeNotifier{
     //flag=false;
   }
 
-  void addNote(Note note){
+  void addNote(Note note)async{
     notesList.add(note);
     notifyListeners();
-    ApiServices.addNoteToCloud(note);
-    insertNoteToLocalDb(note);
+    // await updateCloudNotesFromApiCalls().then((value) => ApiServices.addNoteToCloud(note));
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+      await updateCloudNotesFromApiCalls();
+      await ApiServices.addNoteToCloud(note);
+    }
+    await insertNoteToLocalDb(note);
+
   }
 
-  void updateNote(Note note){
+  Future<void> updateNote(Note note) async {
     print("6666666666666666      "+note.id.toString());
     int idx = notesList.indexOf(notesList.firstWhere((element) => element.id==note.id));
     print("6666666666666666      "+idx.toString());
     notesList[idx]=note;
     notifyListeners();
-    ApiServices.addNoteToCloud(note);
-    updateNoteToLocalDb(note);
+    // await updateCloudNotesFromApiCalls().then((value) => ApiServices.addNoteToCloud(note));
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+      await updateCloudNotesFromApiCalls();
+      await ApiServices.addNoteToCloud(note);
+    }
+
+    await updateNoteToLocalDb(note);
   }
 
-  void deleteNote(Note note){
+  void deleteNote(Note note)async{
     print("201");
     int idx = notesList.indexOf(notesList.firstWhere((element) => element.id==note.id));
     notesList.removeAt(idx);
     notifyListeners();
     print("202");
-    ApiServices.deleteNoteFromCloud(note);
-    deleteNoteToLocalDb(note.id!);
+    // await updateCloudNotesFromApiCalls().then((value) =>  {ApiServices.deleteNoteFromCloud(note)});
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+      await updateCloudNotesFromApiCalls();
+      await ApiServices.deleteNoteFromCloud(note);
+    }
+    await deleteNoteToLocalDb(note.id!);
     print("203");
   }
 
 
-  void updateNotesFromCloud() async{
+  Future<void> updateCloudNotesFromApiCalls() async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+
+      List<Note> listFromCloud,listFromLocal;
+      listFromCloud = await ApiServices.getAllNotesList();
+      listFromLocal = await initialLocalDBsetup();
+
+      await function1(listFromCloud,listFromLocal);
+
+    }
+  }
+
+
+  Future<void> updateNotesFromCloud() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
 
     List<Note> newNotesListFromStorage;
@@ -104,7 +139,7 @@ class NotesProvider with ChangeNotifier{
       // }
 
       print("802");
-      newNotesListFromStorage = await initialLocalDBsetup();;
+      newNotesListFromStorage = await ApiServices.getAllNotesList();
 
       //uploading data from local to api -> now api contains latest data
       //also copying api's latest data to local cache
@@ -139,6 +174,15 @@ class NotesProvider with ChangeNotifier{
 
   Future<void> function1(List<Note> listFromCloud,List<Note> listFromLocal) async {
     print("800");
+    // for(int i=0;i<listFromCloud.length;i++){
+    //   await ApiServices.deleteNoteFromCloud(listFromCloud[i]);
+    //   print("hello 222222222222222222222");
+    // }
+    // for(int i=0;i<listFromLocal.length;i++){
+    //   await ApiServices.addNoteToCloud(listFromLocal[i]);
+    //   print("hello 111111111111111111111111");
+    // }
+
     for(int i=0;i<listFromCloud.length;i++){
       int isPresent = -1;
       for(int j=0;j<listFromLocal.length;j++){
@@ -148,10 +192,12 @@ class NotesProvider with ChangeNotifier{
         }
       }
       if(isPresent==-1){
-        ApiServices.deleteNoteFromCloud(listFromCloud[i]);
+        print("hello 111111111111111111111111");
+        await ApiServices.deleteNoteFromCloud(listFromCloud[i]);
       }
       else{
-        ApiServices.addNoteToCloud(listFromLocal[isPresent]);
+        print("hello 222222222222222222222222222");
+        await ApiServices.addNoteToCloud(listFromLocal[isPresent]);
       }
     }
 
@@ -165,9 +211,12 @@ class NotesProvider with ChangeNotifier{
         }
       }
       if(isPresent==false){
-        ApiServices.addNoteToCloud(listFromLocal[i]);
+        print("hello 3333333333333333333333");
+        await ApiServices.addNoteToCloud(listFromLocal[i]);
       }
     }
+
+    notifyListeners();
   }
 
 
@@ -213,7 +262,7 @@ class NotesProvider with ChangeNotifier{
 
     print("a4");
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = '${directory.path}notes821001.db';
+    String path = '${directory.path}notes5881101.db';
 
     print("a5   "+path);
     var notesDatabase = await openDatabase(path, version: 1, onCreate: _createDb);
