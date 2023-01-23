@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 
@@ -15,7 +16,7 @@ class NotesProvider with ChangeNotifier{
   static bool flag = true;
 
   static Database? _database;
-  String noteTable = 'note_table2221';
+  String noteTable = 'note_table22211';
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
@@ -57,8 +58,6 @@ class NotesProvider with ChangeNotifier{
 
 
   void updateNotesFromCloud() async{
-    // import 'package:connectivity_plus/connectivity_plus.dart';
-    //
     var connectivityResult = await (Connectivity().checkConnectivity());
 
     List<Note> newNotesListFromStorage;
@@ -71,36 +70,41 @@ class NotesProvider with ChangeNotifier{
       listFromCloud = await ApiServices.getAllNotesList();
       listFromLocal = await initialLocalDBsetup();
 
-      print("800");
-      for(int i=0;i<listFromCloud.length;i++){
-        bool isPresent = false;
-        for(int j=0;j<listFromLocal.length;j++){
-          if(listFromCloud[i].id == listFromLocal[j].id){
-            isPresent = true;
-            break;
-          }
-        }
-        if(isPresent==false){
-          insertNoteToLocalDb(listFromCloud[i]);
-        }
-      }
+      await function1(listFromCloud,listFromLocal);
 
-      print("801");
-      for(int i=0;i<listFromLocal.length;i++){
-        bool isPresent = false;
-        for(int j=0;j<listFromCloud.length;j++){
-          if(listFromCloud[j].id == listFromLocal[i].id){
-            isPresent = true;
-            break;
-          }
-        }
-        if(isPresent==false){
-          ApiServices.addNoteToCloud(listFromLocal[i]);
-        }
-      }
+      // print("800");
+      // for(int i=0;i<listFromCloud.length;i++){
+      //   int isPresent = -1;
+      //   for(int j=0;j<listFromLocal.length;j++){
+      //     if(listFromCloud[i].id == listFromLocal[j].id){
+      //       isPresent = j;
+      //       break;
+      //     }
+      //   }
+      //   if(isPresent==-1){
+      //     ApiServices.deleteNoteFromCloud(listFromCloud[i]);
+      //   }
+      //   else{
+      //     ApiServices.addNoteToCloud(listFromLocal[isPresent]);
+      //   }
+      // }
+      //
+      // print("801");
+      // for(int i=0;i<listFromLocal.length;i++){
+      //   bool isPresent = false;
+      //   for(int j=0;j<listFromCloud.length;j++){
+      //     if(listFromCloud[j].id == listFromLocal[i].id){
+      //       isPresent = true;
+      //       break;
+      //     }
+      //   }
+      //   if(isPresent==false){
+      //     ApiServices.addNoteToCloud(listFromLocal[i]);
+      //   }
+      // }
 
       print("802");
-      newNotesListFromStorage = await ApiServices.getAllNotesList();
+      newNotesListFromStorage = await initialLocalDBsetup();;
 
       //uploading data from local to api -> now api contains latest data
       //also copying api's latest data to local cache
@@ -122,14 +126,48 @@ class NotesProvider with ChangeNotifier{
 
     //notesListFromLocalDb   -> from localdb
     //newListFromCloud       -> from clouddb
-
+    newNotesListFromStorage.sort((a, b) => a.title!.compareTo(b.title!));
     notesList = newNotesListFromStorage;
+
     //notesList = <Note>[];
     print("303");
     isDataLoading=false;
     print("304");
     notifyListeners();
     print("305");
+  }
+
+  Future<void> function1(List<Note> listFromCloud,List<Note> listFromLocal) async {
+    print("800");
+    for(int i=0;i<listFromCloud.length;i++){
+      int isPresent = -1;
+      for(int j=0;j<listFromLocal.length;j++){
+        if(listFromCloud[i].id == listFromLocal[j].id){
+          isPresent = j;
+          break;
+        }
+      }
+      if(isPresent==-1){
+        ApiServices.deleteNoteFromCloud(listFromCloud[i]);
+      }
+      else{
+        ApiServices.addNoteToCloud(listFromLocal[isPresent]);
+      }
+    }
+
+    print("801");
+    for(int i=0;i<listFromLocal.length;i++){
+      bool isPresent = false;
+      for(int j=0;j<listFromCloud.length;j++){
+        if(listFromCloud[j].id == listFromLocal[i].id){
+          isPresent = true;
+          break;
+        }
+      }
+      if(isPresent==false){
+        ApiServices.addNoteToCloud(listFromLocal[i]);
+      }
+    }
   }
 
 
@@ -175,7 +213,7 @@ class NotesProvider with ChangeNotifier{
 
     print("a4");
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = '${directory.path}notes321.db';
+    String path = '${directory.path}notes3210.db';
 
     print("a5   "+path);
     var notesDatabase = await openDatabase(path, version: 1, onCreate: _createDb);

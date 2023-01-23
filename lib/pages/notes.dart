@@ -43,7 +43,9 @@ class _NotesListState extends State<NotesList> {
           centerTitle: true,
           actions: <Widget>[
             IconButton(onPressed: (){
-              notesProvider.updateNotesFromCloud();
+              setState(() {
+                notesProvider.updateNotesFromCloud();
+              });
 
             }, icon: Icon(Icons.refresh))
           ],
